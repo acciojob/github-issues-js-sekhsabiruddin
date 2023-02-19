@@ -1,5 +1,4 @@
 //your code here
-//your code here
 
 let pageNumberHere = 1;
 async function fetchData() {
