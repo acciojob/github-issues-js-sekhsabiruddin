@@ -1,39 +1,57 @@
 //your code here
+pageNumH3 = document.querySelector('span');
+nxtBtn = document.getElementById('load_next');
+prvBtn = document.getElementById('load_prev');
 
-let pageNumberHere = 1;
-async function fetchData() {
-  let url = `https://api.github.com/repositories/1296269/issues?page=${pageNumberHere}&per_page=5`;
-  console.log(url);
-  const result = await fetch(url);
-  const data = await result.json();
+let list;
 
-  let pageNumber = document.getElementById("page-number");
-  pageNumber.innerHTML = "Page Number " + pageNumberHere;
+let pageNumber = 1;
 
-  let ol = document.createElement("ol");
-
-  data.map((issue) => {
-    ol.innerHTML += `<li>${issue.title} ${issue.number}</li>`;
-  });
-
-  let dataDiv = document.getElementById("show");
-  dataDiv.innerHTML = "";
-  dataDiv.appendChild(ol);
+function fetchData(pageNumber) {
+	fetch(`https://api.github.com/repositories/1296269/issues?page=${pageNumber}&per_page=5`)
+		.then((response) =>response.json())
+		.then((data) => {
+			// console.log(data.id);
+			let list = document.createElement('ul');
+            list.className = "list";
+			for (let d of data) {
+				// console.log(d.id);
+                let li = document.createElement('li');
+                li.className = "item";
+                li.innerHTML = d.id;
+                list.appendChild(li);
+			}
+            document.body.appendChild(list);
+		})
 }
 
-fetchData();
-let load_next_btn = document.getElementById("load_next");
-
-load_next_btn.addEventListener("click", function (e) {
-  pageNumberHere++;
-  fetchData();
+nxtBtn.addEventListener('click', () => {
+	pageNumber++;
+	if(pageNumber == 2){
+		prvBtn.disabled = false;
+	}
+	let list = document.querySelector('.list');
+    let item = document.getElementsByClassName('item');
+    console.log(item);
+    list.remove(item);
+	fetchData(pageNumber);
+	pageNumH3.innerText = pageNumber;
 });
 
-let load_prev_btn = document.getElementById("load_prev");
-
-load_prev_btn.addEventListener("click", function (e) {
-  if (pageNumberHere >= 2) {
-    pageNumberHere--;
-    fetchData();
-  }
+prvBtn.addEventListener('click', () => {
+	if(pageNumber <= 1){
+		// prvBtn.disabled = true;
+	}
+	else{
+        pageNumber--;
+		// prvBtn.disabled = false;
+        let list = document.querySelector('.list');
+        let item = document.getElementsByClassName('item');
+        // console.log(item);
+        list.remove(item);
+        fetchData(pageNumber);
+        pageNumH3.innerText = pageNumber;
+	}
 });
+
+fetchData(1);
